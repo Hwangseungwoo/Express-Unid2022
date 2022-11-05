@@ -4,15 +4,21 @@ import { KSTDate } from "@lib/common";
 
 export default class TokenService {
   _id: string;
+  id: string;
   token: string;
   createdAt: Date;
   expiredAt: Date;
 
   constructor(result: TokenModel) {
     this._id = String(result._id);
+    this.id = result.id;
     this.token = result.token;
     this.createdAt = result.created_at;
     this.expiredAt = result.expired_at;
+  }
+  static async findOneByToken(token: string): Promise<any> {
+    const tokenDoc: TokenModel | null = await Token.findOne({ token });
+    return tokenDoc ? new TokenService(tokenDoc) : null;
   }
 
   static async issueToken(id: string, name: string): Promise<string | null> {
