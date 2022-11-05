@@ -2,8 +2,8 @@ name: DagymApp
 
 on:
   push:
-    branched:
-      - 'master'
+    tags:
+      'v*.*.*'
 
 jobs:
   deploy:
