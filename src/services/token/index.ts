@@ -32,6 +32,8 @@ export default class TokenService {
     const token: string = jwt.sign(payload, JwtKey, { algorithm: "HS256" });
 
     const nowDate = KSTDate();
+    const expiredDate = KSTDate();
+    expiredDate.setDate(expiredDate.getDate() + 3);
 
     const doc = await Token.findOne({ id });
 
@@ -44,7 +46,7 @@ export default class TokenService {
           $set: {
             token,
             created_at: nowDate,
-            expired_at: nowDate.setDate(nowDate.getDate() + 3),
+            expired_at: expiredDate,
           },
         }
       );
@@ -53,7 +55,7 @@ export default class TokenService {
         token,
         id,
         created_at: nowDate,
-        expired_at: nowDate.setDate(nowDate.getDate() + 3),
+        expired_at: expiredDate,
       }).save();
     }
 
