@@ -27,6 +27,7 @@ export default class UserApi {
       }
 
       const token = await TokenService.issueToken(userId, user.name);
+      delete user.userDoc;
       return res.json({ code: 0, result: { user, token } });
     } catch (error) {
       console.log(error);
@@ -66,6 +67,7 @@ export default class UserApi {
   ) {
     const { id, password, name, gender, age } = body;
     if (!id || !password || !name || !gender || !age) {
+      console.log(id, password);
       return res.json({ code: -1, result: errorList.LackInformation });
     }
 

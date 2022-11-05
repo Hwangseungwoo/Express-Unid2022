@@ -45,6 +45,7 @@ export default class TokenService {
     } else {
       tokenDoc = await new Token({
         token,
+        id,
         created_at: nowDate,
         expired_at: nowDate.setDate(nowDate.getDate() + 3),
       }).save();
