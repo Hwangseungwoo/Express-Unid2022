@@ -1,9 +1,24 @@
 import { jsonResponse, errorList } from "../../types/response";
 import TopicService from "@services/topic";
 import UserService from "@services/user";
+import { KSTDate } from "@lib/common";
 
 export default class TopicApi {
-  static async getTopics(
+  static async getRandomTopic(userId: string, res: jsonResponse): Promise<any> {
+    try {
+      const topic = await TopicService.getNonReadTopic(userId);
+      if (!topic) {
+        return res.json({ code: 0, result: null });
+      }
+
+      return res.json({ code: 0, result: { topic } });
+    } catch (error) {
+      console.log(error);
+      return res.json({ code: -1, result: errorList.Exception });
+    }
+  }
+
+  static async getOnAirTopics(
     sortBy: "latest" | "hot",
     res: jsonResponse
   ): Promise<any> {
@@ -12,22 +27,21 @@ export default class TopicApi {
         return res.json({ code: -1, result: errorList.NotAllowed });
       }
 
-      const topics = await TopicService.find(sortBy);
+      const topics = await TopicService.find(sortBy, false);
 
       if (topics.length === 0) {
-        return res.json({ code: -1, result: errorList.Failed });
+        return res.json({ code: 0, result: [] });
       }
-
-      const users = await UserService.findByIds(
-        topics.map((topic: any) => topic.wroteBy)
-      );
 
       return res.json({
         code: 0,
         result: {
           topics: topics.map((topic: any) => {
-            const user = users.find((user: any) => user.id === topic.wroteBy);
-            return { ...topic, userName: user.name };
+            const nowDate = KSTDate();
+            return {
+              ...topic,
+              remainDays: nowDate.getDate() - topic.finishedAt.getDate(),
+            };
           }),
         },
       });
@@ -37,7 +51,36 @@ export default class TopicApi {
     }
   }
 
-  static async getTopic(topicId: string, res: jsonResponse): Promise<any> {
+  static async getFinishedTopics(res: jsonResponse): Promise<any> {
+    try {
+      const topics = await TopicService.find(null, true);
+
+      if (topics.length === 0) {
+        return res.json({ code: 0, result: [] });
+      }
+
+      return res.json({
+        code: 0,
+        result: {
+          topics: topics.map((topic: any) => {
+            return {
+              ...topic,
+              isAccepted: topic.agrees.length > topic.disagrees.length,
+            };
+          }),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.json({ code: -1, result: errorList.Exception });
+    }
+  }
+
+  static async getTopic(
+    topicId: string,
+    userId: string,
+    res: jsonResponse
+  ): Promise<any> {
     try {
       if (!topicId) {
         return res.json({ code: -1, result: errorList.LackInformation });
@@ -49,15 +92,41 @@ export default class TopicApi {
         return res.json({ code: -1, result: errorList.Failed });
       }
 
-      const user = await UserService.findById(topic.wroteBy);
+      const writeUser = await UserService.findById(topic.wroteBy);
+      // const isBookmarked = await UserService.checkBookmarkStatus();
 
-      if (!user) {
+      if (!writeUser) {
         return res.json({ code: -1, result: errorList.Failed });
       }
 
+      const user = await UserService.findById(userId);
+      if (userId && !user) {
+        return res.json({ code: -1, result: errorList.Failed });
+      }
+
+      const buttonSelected =
+        userId && user
+          ? topic.agrees.includes(userId)
+            ? "agree"
+            : topic.disagrees.includes(userId)
+            ? "disagree"
+            : topic.rejects.includes(userId)
+            ? "rejects"
+            : null
+          : null;
+
+      const nowDate = KSTDate();
+
       return res.json({
         code: 0,
-        result: { topic: { ...topic, userName: user.name } },
+        result: {
+          topic: {
+            ...topic,
+            userName: writeUser.name,
+            buttonSelected,
+            isFinished: topic.finishedAt <= nowDate,
+          },
+        },
       });
     } catch (error) {
       console.log(error);

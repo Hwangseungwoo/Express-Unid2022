@@ -9,6 +9,7 @@ export default class UserService {
   name: string;
   gender: string;
   age: string;
+  favoriteTopics: string[];
   userDoc: UserModel;
 
   constructor(user: UserModel) {
@@ -19,6 +20,7 @@ export default class UserService {
     this.name = user.name;
     this.gender = user.gender;
     this.age = user.age;
+    this.favoriteTopics = user.favorite_topics;
   }
   static async find(): Promise<any> {
     const users: UserModel[] = await User.find();
@@ -110,5 +112,13 @@ export default class UserService {
 
       return new UserService(updatedDoc);
     }
+  }
+
+  static async checkBookmarkStatus(
+    topicId: string,
+    userId: string
+  ): Promise<any> {
+    const user = await User.findOne({ _id: userId });
+    console.log(user);
   }
 }

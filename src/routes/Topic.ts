@@ -11,16 +11,29 @@ router.get(
   "/all/:sortBy",
   asyncWrapper(
     async (req: { params: { sortBy: "latest" | "hot" } }, res: jsonResponse) =>
-      await TopicApi.getTopics(req.params.sortBy, res)
+      await TopicApi.getOnAirTopics(req.params.sortBy, res)
+  )
+);
+
+// 리스트 불러오기
+router.get(
+  "/finished",
+  asyncWrapper(
+    async (res: jsonResponse) => await TopicApi.getFinishedTopics(res)
   )
 );
 
 // 특정 토픽 불러오기
 router.get(
   "/:topicId",
+  Authentication.check(false),
   asyncWrapper(
     async (req: { params: { topicId: string } }, res: jsonResponse) =>
-      await TopicApi.getTopic(req.params.topicId, res)
+      await TopicApi.getTopic(
+        req.params.topicId,
+        res.locals.memberUniqueId,
+        res
+      )
   )
 );
 

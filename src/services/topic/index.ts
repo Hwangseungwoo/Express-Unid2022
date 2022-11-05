@@ -7,11 +7,10 @@ export default class TopicService {
   content: string;
   wroteBy: string;
   wroteAt: Date;
-  agrees: { member_id: string }[];
-  disagrees: { member_id: string }[];
-  rejects: { member_id: string }[];
-  to: String;
-  uploadedAt: Date;
+  agrees: string[];
+  disagrees: string[];
+  rejects: string[];
+  finishedAt: Date;
 
   constructor(doc: TopicModel) {
     this._id = String(doc._id);
@@ -22,22 +21,35 @@ export default class TopicService {
     this.agrees = doc.agrees;
     this.disagrees = doc.disagrees;
     this.rejects = doc.rejects;
-    this.to = doc.to;
-    this.uploadedAt = doc.uploaded_at;
+    this.finishedAt = doc.finished_at;
   }
-  static async find(sortBy: "hot" | "latest"): Promise<any> {
-    let topics: TopicModel[] = await Topic.find();
+  static async find(
+    sortBy: "hot" | "latest" | null,
+    isFinished: boolean
+  ): Promise<any> {
+    const nowDate = KSTDate();
+    if (!isFinished) {
+      let topics: TopicModel[] = await Topic.find({
+        finished_at: { $gt: nowDate },
+      });
 
-    if (sortBy === "hot") {
-      topics.sort(
-        (a, b) =>
-          a.agrees.length +
-          a.disagrees.length -
-          (b.agrees.length + b.disagrees.length)
-      );
+      if (sortBy === "hot") {
+        topics.sort(
+          (a, b) =>
+            a.agrees.length +
+            a.disagrees.length -
+            (b.agrees.length + b.disagrees.length)
+        );
+      }
+
+      return topics.map((topic) => new TopicService(topic));
+    } else {
+      let topics: TopicModel[] = await Topic.find({
+        finished_at: { $lte: nowDate },
+      });
+
+      return topics.map((topic) => new TopicService(topic));
     }
-
-    return topics.map((topic) => new TopicService(topic));
   }
 
   static async findOneById(topicId: string): Promise<TopicService | null> {
@@ -52,6 +64,8 @@ export default class TopicService {
     memberId: string
   ): Promise<any> {
     const nowDate = KSTDate();
+    const finishedDate = KSTDate();
+    finishedDate.setDate(finishedDate.getDate() + 7);
 
     const topicDoc: any = await new Topic({
       title,
@@ -61,8 +75,7 @@ export default class TopicService {
       agrees: [],
       disagrees: [],
       rejects: [],
-      to: "onair",
-      uploaded_at: null,
+      finished_at: finishedDate,
     }).save();
 
     return topicDoc ? new TopicService(topicDoc) : null;
@@ -77,19 +90,19 @@ export default class TopicService {
     if (voteType === "agree") {
       updateVoteResult = await Topic.findOneAndUpdate(
         { _id: topicId },
-        { $push: { agrees: { memberId } } },
+        { $push: { agrees: memberId } },
         { new: true }
       );
     } else if (voteType === "disagree") {
       updateVoteResult = await Topic.findOneAndUpdate(
         { _id: topicId },
-        { $push: { disagrees: { memberId } } },
+        { $push: { disagrees: memberId } },
         { new: true }
       );
     } else {
       updateVoteResult = await Topic.findOneAndUpdate(
         { _id: topicId },
-        { $push: { rejects: { memberId } } },
+        { $push: { rejects: memberId } },
         { new: true }
       );
     }
@@ -110,19 +123,19 @@ export default class TopicService {
     if (voteType === "agree") {
       updateVoteResult = await Topic.findOneAndUpdate(
         { _id: topicId },
-        { $pull: { agrees: { memberId } } },
+        { $pull: { agrees: memberId } },
         { new: true }
       );
     } else if (voteType === "disagree") {
       updateVoteResult = await Topic.findOneAndUpdate(
         { _id: topicId },
-        { $pull: { disagrees: { memberId } } },
+        { $pull: { disagrees: memberId } },
         { new: true }
       );
     } else {
       updateVoteResult = await Topic.findOneAndUpdate(
         { _id: topicId },
-        { $pull: { rejects: { memberId } } },
+        { $pull: { rejects: memberId } },
         { new: true }
       );
     }
@@ -132,5 +145,19 @@ export default class TopicService {
     }
 
     return new TopicService(updateVoteResult);
+  }
+
+  static async getNonReadTopic(userId: string): Promise<any> {
+    const topic: TopicModel | null = await Topic.findOne({
+      $and: [
+        {
+          $nin: { agrees: userId },
+        },
+        { $nin: { disagrees: userId } },
+        { $nin: { rejects: userId } },
+      ],
+    });
+
+    return topic ? new TopicService(topic) : null;
   }
 }
