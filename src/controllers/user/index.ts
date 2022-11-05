@@ -2,6 +2,8 @@ import { UserModel } from "@models/User";
 import { jsonResponse, errorList } from "../../types/response";
 import UserService from "@services/user";
 import TokenService from "@services/token";
+import TopicService from "@services/topic";
+import { KSTDate } from "@lib/common";
 
 export default class UserApi {
   static async login(userId: string, password: string, res: jsonResponse) {
@@ -84,6 +86,145 @@ export default class UserApi {
 
       return res.json({ code: 0 });
     } catch (error) {
+      console.log(error);
+      return res.json({ code: -1, result: errorList.Exception });
+    }
+  }
+
+  static async getUserTopics(
+    id: string,
+    isFinished: string,
+    res: jsonResponse
+  ): Promise<any> {
+    try {
+      if (!id) {
+        return res.json({ code: -1, result: errorList.LackInformation });
+      }
+
+      const topics = await TopicService.findByUserId(id, isFinished);
+
+      return res.json({ code: 0, result: { topics:
+        isFinished == "true"
+          ? topics(
+            (topic: any) => 
+              !(
+                topic.rejects.length >= topic.agrees.length &&
+                topic.rejects.length >= topic.disagrees.length
+              )
+          )
+          .map((topic: any) => {
+            return {
+              ...topic,
+              isAccepted: topic.agress.length > topic.disagrees.length,
+            };
+          })
+          : topics.map((topic: any) => {
+            const nowDate = KSTDate();
+            return {
+              ...topic,
+              remainDays: topic.finishedAt.getDate() - nowDate.getDate(),
+            };
+          }),
+        },
+    });
+    } catch(error) {
+      console.log(error);
+      return res.json({ code: -1, result: errorList.Failed });
+    }
+  }
+
+  static async getUserVoted(
+    id: string,
+    isFinished: string,
+    res: jsonResponse
+  ): Promise<any> {
+    try {
+      if (!id) {
+        return res.json({ code: -1, result: errorList.LackInformation });
+      }
+
+      const user = await UserService.findById_(id);
+
+      if (!user) {
+        return res.json({ code: -1, result: errorList.Failed });
+      }
+
+      const topics = await TopicService.findVotedByUserId(id, isFinished);
+
+      return res.json({ code: 0, result: { topics:
+        isFinished == "true"
+          ? topics(
+            (topic: any) => 
+              !(
+                topic.rejects.length >= topic.agrees.length &&
+                topic.rejects.length >= topic.disagrees.length
+              )
+          )
+          .map((topic: any) => {
+            return {
+              ...topic,
+              isAccepted: topic.agress.length > topic.disagrees.length,
+            };
+          })
+          : topics.map((topic: any) => {
+            const nowDate = KSTDate();
+            return {
+              ...topic,
+              remainDays: topic.finishedAt.getDate() - nowDate.getDate(),
+            };
+          }),
+        },
+    });
+    } catch (error) {
+      console.log(error);
+      res.json({ code: -1, result: errorList.Exception });
+    }
+  }
+
+  static async getUserBookmarks(
+    id: string,
+    isFinished: string,
+    res: jsonResponse
+  ): Promise<any> {
+    try {
+      if (!id) {
+        return res.json({ code: -1, result: errorList.LackInformation });
+      }
+
+      const user = await UserService.findById_(id);
+
+      if (!user) {
+        return res.json({ code: -1, result: errorList.Failed });
+      }
+
+      const topics = await TopicService.findByIds(user.favoriteTopics, isFinished);
+
+      return res.json({ code: 0, result: { topics:
+        isFinished == "true"
+          ? topics(
+            (topic: any) => 
+              !(
+                topic.rejects.length >= topic.agrees.length &&
+                topic.rejects.length >= topic.disagrees.length
+              )
+          )
+          .map((topic: any) => {
+            return {
+              ...topic,
+              isAccepted: topic.agress.length > topic.disagrees.length,
+            };
+          })
+          : topics.map((topic: any) => {
+            const nowDate = KSTDate();
+            return {
+              ...topic,
+              remainDays: topic.finishedAt.getDate() - nowDate.getDate(),
+            };
+          }),
+        },
+    });
+
+    } catch(error) {
       console.log(error);
       return res.json({ code: -1, result: errorList.Exception });
     }
