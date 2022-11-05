@@ -50,7 +50,7 @@ router.get(
   "/topics",
   Authentication.check(true),
   asyncWrapper(
-    async (res: jsonResponse) => await UserApi.getUserTopics(res.locals.memberUniqueId, res)
+    async (req: any, res: jsonResponse) => await UserApi.getUserTopics(res.locals.memberUniqueId, res)
   )
 );
 
@@ -61,8 +61,7 @@ router.get(
   "/bookmarks",
   Authentication.check(true),
   asyncWrapper(
-    async (res: jsonResponse) => {
-      console.log(res.locals);
+    async (req: any, res: jsonResponse) => {
       return await UserApi.getUserTopics(res.locals.memberUniqueId, res)
     }
   )
