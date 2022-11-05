@@ -2,6 +2,7 @@ import { UserModel } from "@models/User";
 import { jsonResponse, errorList } from "../../types/response";
 import UserService from "@services/user";
 import TokenService from "@services/token";
+import TopicService from "@services/topic";
 
 export default class UserApi {
   static async login(
@@ -90,6 +91,32 @@ export default class UserApi {
 
       return res.json({ code: 0 });
     } catch (error) {
+      console.log(error);
+      return res.json({ code: -1, result: errorList.Exception });
+    }
+  }
+
+  static async getUserTopics(
+    id: string,
+    res: jsonResponse
+  ): Promise<any> {
+    try {
+      if (!id) {
+        return res.json({ code: -1, result: errorList.LackInformation });
+      }
+
+      const user = await UserService.findById(id);
+
+      if (!user) {
+        return res.json({ code: -1, result: errorList.Failed });
+      }
+
+      const topics = await user.favoriate_topics.map(async (topic_id: string) => 
+        await TopicService.findOneById(topic_id));
+
+      return res.json({ code: 0, result: { topics }})
+
+    } catch(error) {
       console.log(error);
       return res.json({ code: -1, result: errorList.Exception });
     }
