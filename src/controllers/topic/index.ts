@@ -18,6 +18,22 @@ export default class TopicApi {
     }
   }
 
+  static async searchKey(key: string, res: jsonResponse): Promise<any> {
+    //console.log(title)
+    const topics = await TopicService.searchKeyword(key);
+
+      if (topics.length === 0) {
+        return res.json({ code: 0, result: [] });
+      }
+
+      return res.json({
+        code: 0,
+        result: {
+          topics
+        },
+      });
+    }
+
   static async getOnAirTopics(
     sortBy: "latest" | "hot",
     res: jsonResponse
