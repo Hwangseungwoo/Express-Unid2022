@@ -83,7 +83,7 @@ export default class UserService {
   ): Promise<any> {
     const user: UserModel | null = await User.findOneAndUpdate(
       {id: userId}, 
-      {$push: {favorite_topics: {topicId}}},
+      {$push: {favorite_topics: { _id: new Types.ObjectId(topicId) }}},
       {new: true}
     );
 
