@@ -59,7 +59,7 @@ router.get(
   "/voted/test/test",
   Authentication.check(true),
   asyncWrapper(
-    async (req: any, res: jsonResponse) => await UserApi.getUserVoted(res.locals.memberUniqId, res)
+    async (req: any, res: jsonResponse) => await UserApi.getUserVoted(res.locals.memberUniqueId, res)
   )
 );
 
