@@ -17,7 +17,11 @@ export default class TokenService {
     this.expiredAt = result.expired_at;
   }
   static async findOneByToken(token: string): Promise<any> {
-    const tokenDoc: TokenModel | null = await Token.findOne({ token });
+    const nowDate = KSTDate();
+    const tokenDoc: TokenModel | null = await Token.findOne({
+      token,
+      expired_at: { $gte: nowDate },
+    });
     return tokenDoc ? new TokenService(tokenDoc) : null;
   }
 
@@ -37,9 +41,11 @@ export default class TokenService {
       tokenDoc = await Token.findOneAndUpdate(
         { id },
         {
-          token,
-          created_at: nowDate,
-          expired_at: nowDate.setDate(nowDate.getDate() + 3),
+          $set: {
+            token,
+            created_at: nowDate,
+            expired_at: nowDate.setDate(nowDate.getDate() + 3),
+          },
         }
       );
     } else {
