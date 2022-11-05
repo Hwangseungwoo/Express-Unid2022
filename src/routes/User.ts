@@ -17,6 +17,36 @@ router.post(
   )
 );
 
+// 작성한 토픽 불러오기
+router.get(
+  "/topics",
+  Authentication.check(true),
+  asyncWrapper(
+    async (req: { params: { isFinished: string } }, res: jsonResponse) => 
+    await UserApi.getUserTopics(res.locals.memberUniqueId, req.params.isFinished, res)
+  )
+);
+
+// 참여한 토픽 불러오기
+router.get(
+  "/voted",
+  Authentication.check(true),
+  asyncWrapper(
+    async (req: { params: { isFinished: string }}, res: jsonResponse) => 
+    await UserApi.getUserVoted(res.locals.memberUniqueId, req.params.isFinished, res)
+  )
+);
+
+// 즐려찾기 토픽 불러오기
+router.get(
+  "/bookmarks",
+  Authentication.check(true),
+  asyncWrapper(
+    async (req: { params: { isFinished: string } }, res: jsonResponse) => 
+      await UserApi.getUserBookmarks(res.locals.memberUniqueId, req.params.isFinished, res)
+  )
+);
+
 // id 중복체크
 router.get(
   "/:id",
@@ -42,36 +72,6 @@ router.post(
       },
       res: jsonResponse
     ) => await UserApi.signUp(req.body, res)
-  )
-);
-
-// 작성한 토픽 불러오기
-router.get(
-  "/topics/test/test",
-  Authentication.check(true),
-  asyncWrapper(
-    async (req: { params: { isFinished: string } }, res: jsonResponse) => 
-    await UserApi.getUserTopics(res.locals.memberUniqueId, req.params.isFinished, res)
-  )
-);
-
-// 참여한 토픽 불러오기
-router.get(
-  "/voted/test/test",
-  Authentication.check(true),
-  asyncWrapper(
-    async (req: { params: { isFinished: string }}, res: jsonResponse) => 
-    await UserApi.getUserVoted(res.locals.memberUniqueId, req.params.isFinished, res)
-  )
-);
-
-// 즐려찾기 토픽 불러오기
-router.get(
-  "/bookmarks/test/test",
-  Authentication.check(true),
-  asyncWrapper(
-    async (req: { params: { isFinished: string } }, res: jsonResponse) => 
-      await UserApi.getUserBookmarks(res.locals.memberUniqueId, req.params.isFinished, res)
   )
 );
 
