@@ -4,3 +4,9 @@ export type jsonResponse = {
   redirect(response: string): any;
   locals: any;
 };
+
+export enum errorList {
+  Exception = 0,
+  NoUser = 1,
+  Unauthorized = 2,
+}

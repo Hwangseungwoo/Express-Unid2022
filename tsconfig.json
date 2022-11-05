@@ -23,7 +23,7 @@
     "paths": {
       "@commons/*": ["commons/*"],
       "@controllers/*": ["controllers/*"],
-      "@libs/*": ["libs/*"],
+      "@lib/*": ["lib/*"],
       "@middlewares/*": ["middlewares/*"],
       "@models/*": ["models/*"],
       "@routes/*": ["routes/*"],

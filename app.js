@@ -1,5 +1,5 @@
 require("dotenv").config({ path: `${__dirname}/config.env` });
-
+require("module-alias/register");
 let createError = require("http-errors");
 let express = require("express");
 let cookieParser = require("cookie-parser");
