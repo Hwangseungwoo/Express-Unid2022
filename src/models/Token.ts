@@ -2,6 +2,7 @@ import { Schema } from "mongoose";
 import { db } from "@models/db";
 
 let TokenSchema = new Schema({
+  id: String,
   token: String,
   created_at: Date,
   expired_at: Date,
@@ -9,6 +10,7 @@ let TokenSchema = new Schema({
 
 export interface TokenModel extends Document {
   _id: string;
+  id: string;
   token: string;
   created_at: Date;
   expired_at: Date;

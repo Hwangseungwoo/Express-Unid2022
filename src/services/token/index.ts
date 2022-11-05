@@ -23,11 +23,26 @@ export default class TokenService {
 
     const nowDate = KSTDate();
 
-    const tokenDoc = await new Token({
-      token,
-      created_at: nowDate,
-      expired_at: nowDate.setDate(nowDate.getDate() + 3),
-    }).save();
+    const doc = await Token.findOne({ id });
+
+    let tokenDoc;
+
+    if (doc) {
+      tokenDoc = await Token.findOneAndUpdate(
+        { id },
+        {
+          token,
+          created_at: nowDate,
+          expired_at: nowDate.setDate(nowDate.getDate() + 3),
+        }
+      );
+    } else {
+      tokenDoc = await new Token({
+        token,
+        created_at: nowDate,
+        expired_at: nowDate.setDate(nowDate.getDate() + 3),
+      }).save();
+    }
 
     if (!tokenDoc) {
       return null;
