@@ -30,4 +30,24 @@ export default class UserApi {
       return res.json({ code: -1, result: errorList.Exception });
     }
   }
+
+  static async checkDuplicateId(
+    userId: string,
+    res: jsonResponse
+  ): Promise<any> {
+    try {
+      if (!userId) {
+        return res.json({ code: -1, result: errorList.LackInformation });
+      }
+
+      const user: UserModel | null = await UserService.findById(userId);
+      if (user) {
+        return res.json({ code: -1, result: errorList.Duplicated });
+      }
+      return res.json({ code: 0 });
+    } catch (error) {
+      console.log(error);
+      return res.json({ code: -1, result: errorList.Exception });
+    }
+  }
 }

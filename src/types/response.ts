@@ -10,4 +10,5 @@ export enum errorList {
   NoUser = 1,
   Unauthorized = 2,
   LackInformation = 3,
+  Duplicated = 4,
 }

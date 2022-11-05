@@ -9,8 +9,19 @@ const router = express.Router();
 router.post(
   "/",
   asyncWrapper(
-    async (req: { body: { id: any; password: any } }, res: jsonResponse) =>
-      await UserApi.login(req.body.id, req.body.password, res)
+    async (
+      req: { body: { id: string; password: string } },
+      res: jsonResponse
+    ) => await UserApi.login(req.body.id, req.body.password, res)
+  )
+);
+
+// id 중복체크
+router.get(
+  "/:id",
+  asyncWrapper(
+    async (req: { params: { id: string } }, res: jsonResponse) =>
+      await UserApi.checkDuplicateId(req.params.id, res)
   )
 );
 
