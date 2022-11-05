@@ -92,6 +92,7 @@ export default class UserApi {
 
   static async getUserTopics(
     id: string,
+    finishedAt: string,
     res: jsonResponse
   ): Promise<any> {
     try {
@@ -99,7 +100,7 @@ export default class UserApi {
         return res.json({ code: -1, result: errorList.LackInformation });
       }
 
-      const topics = await TopicService.findByUserId(id);
+      const topics = await TopicService.findByUserId(id, finishedAt);
 
       return res.json({ code: 0, result: { topics }})
     } catch(error) {
@@ -110,6 +111,7 @@ export default class UserApi {
 
   static async getUserVoted(
     id: string,
+    isFinished: string,
     res: jsonResponse
   ): Promise<any> {
     try {
@@ -123,7 +125,7 @@ export default class UserApi {
         return res.json({ code: -1, result: errorList.Failed });
       }
 
-      const voted = await TopicService.findVotedByUserId(id);
+      const voted = await TopicService.findVotedByUserId(id, isFinished);
 
       return res.json({
         code: 0,
@@ -139,6 +141,7 @@ export default class UserApi {
 
   static async getUserBookmarks(
     id: string,
+    isFinished: string,
     res: jsonResponse
   ): Promise<any> {
     try {
@@ -152,9 +155,9 @@ export default class UserApi {
         return res.json({ code: -1, result: errorList.Failed });
       }
 
-      const topics = await TopicService.findByIds(user.favoriteTopics);
+      const topics = await TopicService.findByIds(user.favoriteTopics, isFinished);
 
-      return res.json({ code: 0, result: { topics }})
+      return res.json({ code: 0, result: { topics }});
 
     } catch(error) {
       console.log(error);
