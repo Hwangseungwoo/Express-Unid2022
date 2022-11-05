@@ -53,6 +53,13 @@ export default class TopicService {
     }
   }
 
+  static async findByIds(ids: string[]): Promise<any> {
+    const topics: TopicModel[] = await Topic.find({
+      _id: { $in: ids.map((id) => new Types.ObjectId(id)) },
+    })
+    return topics.map(topic => new TopicService(topic));
+  }
+
   static async findOneById(topicId: string): Promise<TopicService | null> {
     let topic: TopicModel | null = await Topic.findOne({ _id: topicId });
 

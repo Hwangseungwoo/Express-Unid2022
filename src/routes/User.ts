@@ -47,7 +47,7 @@ router.post(
 
 // 작성한 토픽 불러오기
 router.get(
-  "/topics",
+  "/topics/test/test",
   Authentication.check(true),
   asyncWrapper(
     async (req: any, res: jsonResponse) => await UserApi.getUserTopics(res.locals.memberUniqueId, res)
@@ -56,7 +56,7 @@ router.get(
 
 // 참여한 토픽 불러오기
 router.get(
-  "/voted",
+  "/voted/test/test",
   Authentication.check(true),
   asyncWrapper(
     async (req: any, res: jsonResponse) => await UserApi.getUserVoted(res.locals.memberUniqId, res)
@@ -65,12 +65,11 @@ router.get(
 
 // 즐려찾기 토픽 불러오기
 router.get(
-  "/bookmarks",
+  "/bookmarks/test/test",
   Authentication.check(true),
   asyncWrapper(
-    async (req: any, res: jsonResponse) => {
-      return await UserApi.getUserTopics(res.locals.memberUniqueId, res)
-    }
+    async (req: any, res: jsonResponse) => 
+      await UserApi.getUserBookmarks(res.locals.memberUniqueId, res)
   )
 );
 

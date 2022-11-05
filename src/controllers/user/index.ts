@@ -146,14 +146,13 @@ export default class UserApi {
         return res.json({ code: -1, result: errorList.LackInformation });
       }
 
-      const user = await UserService.findById(id);
+      const user = await UserService.findById_(id);
 
       if (!user) {
         return res.json({ code: -1, result: errorList.Failed });
       }
 
-      const topics = await user.favoriate_topics.map(async (topic_id: string) => 
-        await TopicService.findOneById(topic_id));
+      const topics = await TopicService.findByIds(user.favoriteTopics);
 
       return res.json({ code: 0, result: { topics }})
 
