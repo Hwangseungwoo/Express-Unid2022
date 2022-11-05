@@ -1,0 +1,23 @@
+# node dependency
+node_modules
+
+# dist
+build
+
+# intellij
+.idea
+
+package-lock.json
+production.env
+tmp
+template
+api_*.json
+
+create-doc.sh
+config.env
+npm-install.sh
+
+.DS_Store
+
+
+.vscode/*

@@ -1,0 +1,12 @@
+name: DagymApp
+
+on:
+  push:
+    branched:
+      - 'master'
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Builder]
+    steps:
+      - uses: actions/checkout@v3
