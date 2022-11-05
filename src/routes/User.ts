@@ -46,6 +46,13 @@ router.post(
 );
 
 // 작성한 토픽 불러오기
+router.get(
+  "/topics",
+  Authentication.check(true),
+  asyncWrapper(
+    async (res: jsonResponse) => await UserApi.getUserTopics(res.locals.memberUniqueId, res)
+  )
+);
 
 // 참여한 토픽 불러오기
 
