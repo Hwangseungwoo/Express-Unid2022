@@ -163,4 +163,10 @@ export default class TopicService {
       ? new TopicService(topic)
       : null;
   }
+
+  static async searchKeyword(title: string): Promise<any> {
+    const topics: TopicModel[] = await Topic.find({title:{$regex:title}});
+    return topics.map((topic)=>new TopicService(topic))
+    
+  }
 }

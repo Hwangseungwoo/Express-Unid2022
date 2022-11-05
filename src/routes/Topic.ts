@@ -33,6 +33,14 @@ router.get(
   )
 );
 
+//토픽 전부 불러오기
+router.get(
+  "/search/:key",
+  asyncWrapper(
+    async (req: { params: { key: string } }, res: jsonResponse) => await TopicApi.searchKey(req.params.key, res)
+  )
+);
+
 // 특정 토픽 불러오기
 router.get(
   "/:topicId",
