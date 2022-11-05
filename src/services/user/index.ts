@@ -68,6 +68,7 @@ export default class UserService {
       name,
       gender,
       age,
+      favorite_topics: []
     }).save();
 
     if (!userDoc) {

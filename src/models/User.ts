@@ -7,7 +7,7 @@ let UserSchema = new Schema({
   name: String,
   gender: String,
   age: Number,
-  favorite_topics: [{ topic_id: Schema.Types.ObjectId }],
+  favorite_topics: [ Schema.Types.ObjectId ],
 });
 
 export interface UserModel extends Document {
@@ -17,7 +17,7 @@ export interface UserModel extends Document {
   name: string;
   gender: string;
   age: string;
-  favorite_topics: { topic_id: string }[];
+  favorite_topics: string[];
 }
 
 export let User = db.model("user", UserSchema);
