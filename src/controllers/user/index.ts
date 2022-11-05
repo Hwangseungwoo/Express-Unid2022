@@ -65,28 +65,33 @@ export default class UserApi {
     },
     res: jsonResponse
   ) {
-    const { id, password, name, gender, age } = body;
-    if (!id || !password || !name || !gender || !age) {
-      console.log(id, password);
-      return res.json({ code: -1, result: errorList.LackInformation });
+    try {
+      const { id, password, name, gender, age } = body;
+      if (!id || !password || !name || !gender || !age) {
+        console.log(id, password);
+        return res.json({ code: -1, result: errorList.LackInformation });
+      }
+
+      if (age > 30) {
+        return res.json({ code: -1, result: errorList.NotAllowed });
+      }
+
+      const isSignUpSucceeded = await UserService.insertUser(
+        id,
+        password,
+        name,
+        gender,
+        age
+      );
+
+      if (!isSignUpSucceeded) {
+        return res.json({ code: -1, result: errorList.Failed });
+      }
+
+      return res.json({ code: 0 });
+    } catch (error) {
+      console.log(error);
+      return res.json({ code: -1, result: errorList.Exception });
     }
-
-    if (age > 30) {
-      return res.json({ code: -1, result: errorList.NotAllowed });
-    }
-
-    const isSignUpSucceeded = await UserService.insertUser(
-      id,
-      password,
-      name,
-      gender,
-      age
-    );
-
-    if (!isSignUpSucceeded) {
-      return res.json({ code: -1, result: errorList.Failed });
-    }
-
-    return res.json({ code: 0 });
   }
 }
