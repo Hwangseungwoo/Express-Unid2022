@@ -3,6 +3,7 @@ import { jsonResponse, errorList } from "../../types/response";
 import UserService from "@services/user";
 import TokenService from "@services/token";
 import TopicService from "@services/topic";
+import { KSTDate } from "@lib/common";
 
 export default class UserApi {
   static async login(userId: string, password: string, res: jsonResponse) {
@@ -92,7 +93,7 @@ export default class UserApi {
 
   static async getUserTopics(
     id: string,
-    finishedAt: string,
+    isFinished: string,
     res: jsonResponse
   ): Promise<any> {
     try {
@@ -100,9 +101,32 @@ export default class UserApi {
         return res.json({ code: -1, result: errorList.LackInformation });
       }
 
-      const topics = await TopicService.findByUserId(id, finishedAt);
+      const topics = await TopicService.findByUserId(id, isFinished);
 
-      return res.json({ code: 0, result: { topics }})
+      return res.json({ code: 0, result: { topics:
+        isFinished == "true"
+          ? topics(
+            (topic: any) => 
+              !(
+                topic.rejects.length >= topic.agrees.length &&
+                topic.rejects.length >= topic.disagrees.length
+              )
+          )
+          .map((topic: any) => {
+            return {
+              ...topic,
+              isAccepted: topic.agress.length > topic.disagrees.length,
+            };
+          })
+          : topics.map((topic: any) => {
+            const nowDate = KSTDate();
+            return {
+              ...topic,
+              remainDays: topic.finishedAt.getDate() - nowDate.getDate(),
+            };
+          }),
+        },
+    });
     } catch(error) {
       console.log(error);
       return res.json({ code: -1, result: errorList.Failed });
@@ -125,14 +149,32 @@ export default class UserApi {
         return res.json({ code: -1, result: errorList.Failed });
       }
 
-      const voted = await TopicService.findVotedByUserId(id, isFinished);
+      const topics = await TopicService.findVotedByUserId(id, isFinished);
 
-      return res.json({
-        code: 0,
-        result: {
-          topics: voted
-        }
-      })
+      return res.json({ code: 0, result: { topics:
+        isFinished == "true"
+          ? topics(
+            (topic: any) => 
+              !(
+                topic.rejects.length >= topic.agrees.length &&
+                topic.rejects.length >= topic.disagrees.length
+              )
+          )
+          .map((topic: any) => {
+            return {
+              ...topic,
+              isAccepted: topic.agress.length > topic.disagrees.length,
+            };
+          })
+          : topics.map((topic: any) => {
+            const nowDate = KSTDate();
+            return {
+              ...topic,
+              remainDays: topic.finishedAt.getDate() - nowDate.getDate(),
+            };
+          }),
+        },
+    });
     } catch (error) {
       console.log(error);
       res.json({ code: -1, result: errorList.Exception });
@@ -157,7 +199,30 @@ export default class UserApi {
 
       const topics = await TopicService.findByIds(user.favoriteTopics, isFinished);
 
-      return res.json({ code: 0, result: { topics }});
+      return res.json({ code: 0, result: { topics:
+        isFinished == "true"
+          ? topics(
+            (topic: any) => 
+              !(
+                topic.rejects.length >= topic.agrees.length &&
+                topic.rejects.length >= topic.disagrees.length
+              )
+          )
+          .map((topic: any) => {
+            return {
+              ...topic,
+              isAccepted: topic.agress.length > topic.disagrees.length,
+            };
+          })
+          : topics.map((topic: any) => {
+            const nowDate = KSTDate();
+            return {
+              ...topic,
+              remainDays: topic.finishedAt.getDate() - nowDate.getDate(),
+            };
+          }),
+        },
+    });
 
     } catch(error) {
       console.log(error);
