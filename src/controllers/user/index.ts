@@ -10,7 +10,7 @@ export default class UserApi {
         return res.json({ code: -1, result: errorList.LackInformation });
       }
 
-      const user = await UserService.findById(userId);
+      const user = await UserService.findOneById(userId);
 
       if (!user) {
         return res.json({ code: -1, result: errorList.NoUser });
@@ -32,12 +32,13 @@ export default class UserApi {
   }
 
   static async checkDuplicateId(userId: string, res: jsonResponse) {
+    console.log(userId);
     try {
       if (!userId) {
         return res.json({ code: -1, result: errorList.LackInformation });
       }
 
-      const user: UserModel | null = await UserService.findById(userId);
+      const user: UserModel | null = await UserService.findOneById(userId);
       if (user) {
         return res.json({ code: -1, result: errorList.Duplicated });
       }

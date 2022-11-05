@@ -74,7 +74,7 @@ export default class TopicApi {
             const nowDate = KSTDate();
             return {
               ...topic,
-              remainDays: nowDate.getDate() - topic.finishedAt.getDate(),
+              remainDays: topic.finishedAt.getDate() - nowDate.getDate(),
             };
           }),
         },
@@ -276,7 +276,7 @@ export default class TopicApi {
       const user = await UserService.insertFavorite(memberId, topic._id);
 
       if (!user) {
-        return res.json({ code: -11, result: errorList.Failed });
+        return res.json({ code: -1, result: errorList.Failed });
       }
 
       return res.json({

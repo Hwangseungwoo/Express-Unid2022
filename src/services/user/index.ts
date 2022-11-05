@@ -87,7 +87,7 @@ export default class UserService {
   }
 
   static async insertFavorite(userId: string, topicId: string): Promise<any> {
-    const user: UserModel | null = await User.findOne({ id: userId });
+    const user: UserModel | null = await User.findOne({ _id: userId });
 
     if (!user) {
       return null;
@@ -95,7 +95,7 @@ export default class UserService {
 
     if (!user.favorite_topics.includes(topicId)) {
       const updatedDoc: UserModel | null = await User.findOneAndUpdate(
-        { id: userId },
+        { _id: userId },
         { $push: { favorite_topics: new Types.ObjectId(topicId) } },
         { new: true }
       );
@@ -107,7 +107,7 @@ export default class UserService {
       return new UserService(updatedDoc);
     } else {
       const updatedDoc: UserModel | null = await User.findOneAndUpdate(
-        { id: userId },
+        { _id: userId },
         { $pull: { favorite_topics: new Types.ObjectId(topicId) } },
         { new: true }
       );

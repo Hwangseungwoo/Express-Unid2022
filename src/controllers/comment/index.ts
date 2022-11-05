@@ -128,7 +128,7 @@ export default class CommentApi {
       const comments = await CommentService.findById(topicId);
 
       if (comments.length === 0) {
-        return res.json({ code: -1, result: errorList.Failed });
+        return res.json({ code: 0, result: [] });
       }
 
       return res.json({

@@ -72,7 +72,7 @@ router.post(
 
 // 토픽에 찬성, 반대, 거절 수정
 router.put(
-  "/likes/:topicId/likes/:likeType",
+  "/toggle/:topicId/likes/:likeType",
   Authentication.check(true),
   asyncWrapper(
     async (
