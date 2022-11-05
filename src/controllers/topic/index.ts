@@ -62,12 +62,20 @@ export default class TopicApi {
       return res.json({
         code: 0,
         result: {
-          topics: topics.map((topic: any) => {
-            return {
-              ...topic,
-              isAccepted: topic.agrees.length > topic.disagrees.length,
-            };
-          }),
+          topics: topics
+            .filter(
+              (topic: any) =>
+                !(
+                  topic.rejects.length >= topic.agrees.length &&
+                  topic.rejects.length >= topic.disagrees.length
+                )
+            )
+            .map((topic: any) => {
+              return {
+                ...topic,
+                isAccepted: topic.agrees.length > topic.disagrees.length,
+              };
+            }),
         },
       });
     } catch (error) {
