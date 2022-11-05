@@ -4,7 +4,7 @@ import UserService from "@services/user";
 import { KSTDate } from "@lib/common";
 
 export default class TopicApi {
-  static async getRandomTopic(userId: string, res: jsonResponse): Promise<any> {
+  static async getRandomTopic(userId: string, res: jsonResponse) {
     try {
       const topic = await TopicService.getNonReadTopic(userId);
       if (!topic) {
@@ -18,26 +18,44 @@ export default class TopicApi {
     }
   }
 
-  static async searchKey(key: string, res: jsonResponse): Promise<any> {
-    //console.log(title)
-    const topics = await TopicService.searchKeyword(key);
+  static async searchKey(key: string, isFinished: string, res: jsonResponse) {
+    const topics = await TopicService.searchKeyword(key, isFinished);
 
-      if (topics.length === 0) {
-        return res.json({ code: 0, result: [] });
-      }
-
-      return res.json({
-        code: 0,
-        result: {
-          topics
-        },
-      });
+    if (topics.length === 0) {
+      return res.json({ code: 0, result: [] });
     }
 
-  static async getOnAirTopics(
-    sortBy: "latest" | "hot",
-    res: jsonResponse
-  ): Promise<any> {
+    return res.json({
+      code: 0,
+      result: {
+        topics:
+          isFinished === "true"
+            ? topics
+                .filter(
+                  (topic: any) =>
+                    !(
+                      topic.rejects.length >= topic.agrees.length &&
+                      topic.rejects.length >= topic.disagrees.length
+                    )
+                )
+                .map((topic: any) => {
+                  return {
+                    ...topic,
+                    isAccepted: topic.agrees.length > topic.disagrees.length,
+                  };
+                })
+            : topics.map((topic: any) => {
+                const nowDate = KSTDate();
+                return {
+                  ...topic,
+                  remainDays: nowDate.getDate() - topic.finishedAt.getDate(),
+                };
+              }),
+      },
+    });
+  }
+
+  static async getOnAirTopics(sortBy: "latest" | "hot", res: jsonResponse) {
     try {
       if (!["latest", "hot"].includes(sortBy)) {
         return res.json({ code: -1, result: errorList.NotAllowed });
@@ -67,7 +85,7 @@ export default class TopicApi {
     }
   }
 
-  static async getFinishedTopics(res: jsonResponse): Promise<any> {
+  static async getFinishedTopics(res: jsonResponse) {
     try {
       const topics = await TopicService.find(null, true);
 
@@ -100,11 +118,7 @@ export default class TopicApi {
     }
   }
 
-  static async getTopic(
-    topicId: string,
-    userId: string,
-    res: jsonResponse
-  ): Promise<any> {
+  static async getTopic(topicId: string, userId: string, res: jsonResponse) {
     try {
       if (!topicId) {
         return res.json({ code: -1, result: errorList.LackInformation });
@@ -169,7 +183,7 @@ export default class TopicApi {
     },
     memberId: string,
     res: jsonResponse
-  ): Promise<any> {
+  ) {
     try {
       const { title, content } = body;
       if (!title || !content) {

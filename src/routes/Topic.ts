@@ -29,15 +29,18 @@ router.get(
 router.get(
   "/finished",
   asyncWrapper(
-    async (res: jsonResponse) => await TopicApi.getFinishedTopics(res)
+    async (req: any, res: jsonResponse) => await TopicApi.getFinishedTopics(res)
   )
 );
 
 //토픽 전부 불러오기
 router.get(
-  "/search/:key",
+  "/search/:key/type/:isFinished",
   asyncWrapper(
-    async (req: { params: { key: string } }, res: jsonResponse) => await TopicApi.searchKey(req.params.key, res)
+    async (
+      req: { params: { key: string; isFinished: string } },
+      res: jsonResponse
+    ) => await TopicApi.searchKey(req.params.key, req.params.isFinished, res)
   )
 );
 

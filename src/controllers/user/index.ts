@@ -4,11 +4,7 @@ import UserService from "@services/user";
 import TokenService from "@services/token";
 
 export default class UserApi {
-  static async login(
-    userId: string,
-    password: string,
-    res: jsonResponse
-  ): Promise<any> {
+  static async login(userId: string, password: string, res: jsonResponse) {
     try {
       if (!userId || !password) {
         return res.json({ code: -1, result: errorList.LackInformation });
@@ -35,10 +31,7 @@ export default class UserApi {
     }
   }
 
-  static async checkDuplicateId(
-    userId: string,
-    res: jsonResponse
-  ): Promise<any> {
+  static async checkDuplicateId(userId: string, res: jsonResponse) {
     try {
       if (!userId) {
         return res.json({ code: -1, result: errorList.LackInformation });

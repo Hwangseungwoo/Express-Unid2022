@@ -164,9 +164,19 @@ export default class TopicService {
       : null;
   }
 
-  static async searchKeyword(title: string): Promise<any> {
-    const topics: TopicModel[] = await Topic.find({title:{$regex:title}});
-    return topics.map((topic)=>new TopicService(topic))
-    
+  static async searchKeyword(key: string, isFinished: string): Promise<any> {
+    let topics: TopicModel[] = await Topic.find({
+      $or: [{ title: { $regex: key } }, { content: { $regex: key } }],
+    });
+
+    const nowDate = KSTDate();
+
+    if (isFinished === "true") {
+      topics.filter((topic) => topic.finished_at <= nowDate);
+    } else {
+      topics.filter((topic) => topic.finished_at > nowDate);
+    }
+
+    return topics.map((topic) => new TopicService(topic));
   }
 }
