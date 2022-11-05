@@ -173,16 +173,12 @@ export default class TopicApi {
     }
   }
 
-  static async likeFavoriteTopic(
-    topicId: string,
-    memberId: string,
-    res: jsonResponse
-  ) {
+  static async markTopic(topicId: string, memberId: string, res: jsonResponse) {
     try {
-      if (!topicId  || !memberId) {
-        return res.json({ code: -1, result: errorList.LackInformation});
+      if (!topicId || !memberId) {
+        return res.json({ code: -1, result: errorList.LackInformation });
       }
-      
+
       const topic = await TopicService.findOneById(topicId);
 
       if (!topic) {
@@ -197,9 +193,8 @@ export default class TopicApi {
 
       return res.json({
         code: 0,
-        result: {...user}
-      })
-
+        result: { user },
+      });
     } catch (error) {
       console.log(error);
       return res.json({ code: -1, result: errorList.Exception });

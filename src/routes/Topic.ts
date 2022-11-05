@@ -77,15 +77,12 @@ router.put(
   "/:topicId/favorite",
   Authentication.check(true),
   asyncWrapper(
-    async (
-      req: { params: { topicId: string }},
-      res: jsonResponse
-    ) => 
-    await TopicApi.likeFavoriteTopic(
-      req.params.topicId,
-      res.locals.memberUniqueId,
-      res
-    )
+    async (req: { params: { topicId: string } }, res: jsonResponse) =>
+      await TopicApi.markTopic(
+        req.params.topicId,
+        res.locals.memberUniqueId,
+        res
+      )
   )
 );
 
