@@ -74,7 +74,7 @@ router.put(
 
 // 토픽 즐겨찾기
 router.put(
-  ":topicId/favorite",
+  "/:topicId/favorite",
   Authentication.check(true),
   asyncWrapper(
     async (
