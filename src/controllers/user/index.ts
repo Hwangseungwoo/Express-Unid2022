@@ -119,12 +119,11 @@ export default class UserApi {
     res: jsonResponse
   ): Promise<any> {
     try {
-      console.log(id);
       if (!id) {
         return res.json({ code: -1, result: errorList.LackInformation });
       }
 
-      const user = await UserService.findById(id);
+      const user = await UserService.findById_(id);
 
       if (!user) {
         return res.json({ code: -1, result: errorList.Failed });
