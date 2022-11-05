@@ -172,4 +172,37 @@ export default class TopicApi {
       return res.json({ code: -1, result: errorList.Exception });
     }
   }
+
+  static async likeFavoriteTopic(
+    topicId: string,
+    memberId: string,
+    res: jsonResponse
+  ) {
+    try {
+      if (!topicId  || !memberId) {
+        return res.json({ code: -1, result: errorList.LackInformation});
+      }
+      
+      const topic = await TopicService.findOneById(topicId);
+
+      if (!topic) {
+        return res.json({ code: -1, result: errorList.Failed });
+      }
+
+      const user = await UserService.insertFavorite(memberId, topic._id);
+
+      if (!user) {
+        return res.json({ code: -11, result: errorList.Failed });
+      }
+
+      return res.json({
+        code: 0,
+        result: {...user}
+      })
+
+    } catch (error) {
+      console.log(error);
+      return res.json({ code: -1, result: errorList.Exception });
+    }
+  }
 }
