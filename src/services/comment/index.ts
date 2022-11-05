@@ -11,9 +11,9 @@ export default class CommentService {
 
   constructor(doc: CommentModel) {
     this._id = String(doc._id);
-    this.topicId = doc.topic_id;
+    this.topicId = String(doc.topic_id);
     this.content = doc.content;
-    this.wroteBy = doc.wrote_by;
+    this.wroteBy = String(doc.wrote_by);
     this.wroteAt = doc.wrote_at;
     this.editable = false;
   }

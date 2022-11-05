@@ -16,7 +16,7 @@ export default class TopicService {
     this._id = String(doc._id);
     this.title = doc.title;
     this.content = doc.content;
-    this.wroteBy = doc.wrote_by;
+    this.wroteBy = String(doc.wrote_by);
     this.wroteAt = doc.wrote_at;
     this.agrees = doc.agrees;
     this.disagrees = doc.disagrees;

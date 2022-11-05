@@ -35,6 +35,12 @@ export default class UserService {
   }
 
   static async findById(id: string): Promise<any> {
+    const user: UserModel | null = await User.findOne({ _id: id });
+
+    return user ? new UserService(user) : null;
+  }
+
+  static async findOneById(id: string): Promise<any> {
     const user: UserModel | null = await User.findOne({ id });
 
     return user ? new UserService(user) : null;
