@@ -25,6 +25,7 @@ export default class UserApi {
       if (!isSamePassword) {
         return res.json({ code: -1, result: errorList.Unauthorized });
       }
+
       const token = await TokenService.issueToken(userId, user.name);
       return res.json({ code: 0, result: { user, token } });
     } catch (error) {
