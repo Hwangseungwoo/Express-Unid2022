@@ -61,7 +61,7 @@ router.post(
 
 // 토픽에 찬성, 반대, 거절 수정
 router.put(
-  "/:topicId/likes/:likeType",
+  "/likes/:topicId/likes/:likeType",
   Authentication.check(true),
   asyncWrapper(
     async (
@@ -79,7 +79,7 @@ router.put(
 
 // 토픽 즐겨찾기
 router.put(
-  "/:topicId/favorite",
+  "/favorite/:topicId",
   Authentication.check(true),
   asyncWrapper(
     async (req: { params: { topicId: string } }, res: jsonResponse) =>
