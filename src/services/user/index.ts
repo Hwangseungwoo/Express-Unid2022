@@ -124,7 +124,14 @@ export default class UserService {
     topicId: string,
     userId: string
   ): Promise<any> {
-    const user = await User.findOne({ _id: userId });
-    console.log(user);
+    const user: UserModel | null = await User.findOne({ _id: userId });
+
+    if (!user) {
+      return false;
+    }
+
+    const userDoc = new UserService(user);
+
+    return userDoc.favoriteTopics.includes(topicId);
   }
 }

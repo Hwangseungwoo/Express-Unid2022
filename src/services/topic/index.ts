@@ -81,63 +81,58 @@ export default class TopicService {
     return topicDoc ? new TopicService(topicDoc) : null;
   }
 
-  static async voteToTopic(
+  static async updateVoteStatus(
     voteType: string,
     topicId: string,
-    memberId: string
+    memberId: string,
+    includeType: string | null
   ): Promise<any> {
     let updateVoteResult: TopicModel | null;
-    if (voteType === "agree") {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $push: { agrees: memberId } },
-        { new: true }
-      );
-    } else if (voteType === "disagree") {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $push: { disagrees: memberId } },
-        { new: true }
-      );
+
+    if (includeType) {
+      if (includeType !== voteType) {
+        return null;
+      } else {
+        if (voteType === "agree") {
+          updateVoteResult = await Topic.findOneAndUpdate(
+            { _id: topicId },
+            { $pull: { agrees: memberId } },
+            { new: true }
+          );
+        } else if (voteType === "disagree") {
+          updateVoteResult = await Topic.findOneAndUpdate(
+            { _id: topicId },
+            { $pull: { disagrees: memberId } },
+            { new: true }
+          );
+        } else {
+          updateVoteResult = await Topic.findOneAndUpdate(
+            { _id: topicId },
+            { $pull: { rejects: memberId } },
+            { new: true }
+          );
+        }
+      }
     } else {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $push: { rejects: memberId } },
-        { new: true }
-      );
-    }
-
-    if (!updateVoteResult) {
-      return null;
-    }
-
-    return new TopicService(updateVoteResult);
-  }
-
-  static async CancelTopic(
-    voteType: string,
-    topicId: string,
-    memberId: string
-  ): Promise<any> {
-    let updateVoteResult: TopicModel | null;
-    if (voteType === "agree") {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $pull: { agrees: memberId } },
-        { new: true }
-      );
-    } else if (voteType === "disagree") {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $pull: { disagrees: memberId } },
-        { new: true }
-      );
-    } else {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $pull: { rejects: memberId } },
-        { new: true }
-      );
+      if (voteType === "agree") {
+        updateVoteResult = await Topic.findOneAndUpdate(
+          { _id: topicId },
+          { $push: { agrees: memberId } },
+          { new: true }
+        );
+      } else if (voteType === "disagree") {
+        updateVoteResult = await Topic.findOneAndUpdate(
+          { _id: topicId },
+          { $push: { disagrees: memberId } },
+          { new: true }
+        );
+      } else {
+        updateVoteResult = await Topic.findOneAndUpdate(
+          { _id: topicId },
+          { $push: { rejects: memberId } },
+          { new: true }
+        );
+      }
     }
 
     if (!updateVoteResult) {

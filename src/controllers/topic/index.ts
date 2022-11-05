@@ -101,7 +101,10 @@ export default class TopicApi {
       }
 
       const writeUser = await UserService.findById(topic.wroteBy);
-      // const isBookmarked = await UserService.checkBookmarkStatus();
+      const isBookmarked = await UserService.checkBookmarkStatus(
+        userId,
+        topicId
+      );
 
       if (!writeUser) {
         return res.json({ code: -1, result: errorList.Failed });
@@ -133,6 +136,7 @@ export default class TopicApi {
             userName: writeUser.name,
             buttonSelected,
             isFinished: topic.finishedAt <= nowDate,
+            isBookmarked,
           },
         },
       });
@@ -169,7 +173,7 @@ export default class TopicApi {
     }
   }
 
-  static async voteTopic(
+  static async changeVoteStatus(
     topicId: string,
     voteType: string,
     memberId: string,
@@ -184,16 +188,32 @@ export default class TopicApi {
         return res.json({ code: -1, result: errorList.NotAllowed });
       }
 
-      const voteResult = await TopicService.voteToTopic(
-        voteType,
-        topicId,
-        memberId
-      );
-      if (!voteResult) {
-        return res.json({ code: -1, result: errorList.Failed });
+      const topic = await TopicService.findOneById(topicId);
+
+      if (!topic) {
+        return res.json({ code: -1, result: errorList.NoData });
       }
 
-      const user = await UserService.findById(voteResult.wroteBy);
+      const includeType = topic.agrees.includes(memberId)
+        ? "agrees"
+        : topic.disagrees.includes(memberId)
+        ? "disagrees"
+        : topic.rejects.includes(memberId)
+        ? "rejects"
+        : null;
+
+      const voteResult = await TopicService.updateVoteStatus(
+        voteType,
+        topicId,
+        memberId,
+        includeType
+      );
+
+      if (!voteResult) {
+        return res.json({ code: -1, result: errorList.Unable });
+      }
+
+      const user = await UserService.findById(topic.wroteBy);
 
       if (!user) {
         return res.json({ code: -1, result: errorList.Failed });
@@ -201,48 +221,9 @@ export default class TopicApi {
 
       return res.json({
         code: 0,
-        result: { topic: { ...voteResult, userName: user.name } },
-      });
-    } catch (error) {
-      console.log(error);
-      return res.json({ code: -1, result: errorList.Exception });
-    }
-  }
-
-  static async cancelVote(
-    topicId: string,
-    voteType: string,
-    memberId: string,
-    res: jsonResponse
-  ) {
-    try {
-      if (!voteType || !topicId) {
-        return res.json({ code: -1, result: errorList.LackInformation });
-      }
-
-      if (!["agree", "disagree", "reject"].includes(voteType)) {
-        return res.json({ code: -1, result: errorList.NotAllowed });
-      }
-
-      const voteResult = await TopicService.CancelTopic(
-        voteType,
-        topicId,
-        memberId
-      );
-
-      if (!voteResult) {
-        return res.json({ code: -1, result: errorList.Failed });
-      }
-
-      const user = await UserService.findById(voteResult.wroteBy);
-
-      if (!user) {
-        return res.json({ code: -1, result: errorList.Failed });
-      }
-
-      return res.json({
-        code: 0,
-        result: { ...voteResult, userName: user.name },
+        result: {
+          buttonSelected: voteType === includeType ? null : voteType,
+        },
       });
     } catch (error) {
       console.log(error);
@@ -270,7 +251,9 @@ export default class TopicApi {
 
       return res.json({
         code: 0,
-        result: { user },
+        result: {
+          isBookMarked: user.favoriteTopics.includes(topicId),
+        },
       });
     } catch (error) {
       console.log(error);

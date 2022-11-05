@@ -59,34 +59,16 @@ router.post(
   )
 );
 
-// 토픽에 찬성, 반대, 거절
-router.post(
-  ":topicId/likes/:likeType",
-  Authentication.check(true),
-  asyncWrapper(
-    async (
-      req: { params: { topicId: string; likeType: string } },
-      res: jsonResponse
-    ) =>
-      await TopicApi.voteTopic(
-        req.params.topicId,
-        req.params.likeType,
-        res.locals.memberUniqueId,
-        res
-      )
-  )
-);
-
 // 토픽에 찬성, 반대, 거절 수정
 router.put(
-  ":topicId/likes/:likeType",
+  "/:topicId/likes/:likeType",
   Authentication.check(true),
   asyncWrapper(
     async (
       req: { params: { topicId: string; likeType: string } },
       res: jsonResponse
     ) =>
-      await TopicApi.cancelVote(
+      await TopicApi.changeVoteStatus(
         req.params.topicId,
         req.params.likeType,
         res.locals.memberUniqueId,
