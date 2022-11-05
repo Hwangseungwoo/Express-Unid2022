@@ -55,6 +55,13 @@ router.get(
 );
 
 // 참여한 토픽 불러오기
+router.get(
+  "/voted",
+  Authentication.check(true),
+  asyncWrapper(
+    async (req: any, res: jsonResponse) => await UserApi.getUserVoted(res.locals.memberUniqId, res)
+  )
+);
 
 // 즐려찾기 토픽 불러오기
 router.get(

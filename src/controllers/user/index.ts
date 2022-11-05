@@ -114,6 +114,36 @@ export default class UserApi {
     }
   }
 
+  static async getUserVoted(
+    id: string,
+    res: jsonResponse
+  ): Promise<any> {
+    try {
+      console.log(id);
+      if (!id) {
+        return res.json({ code: -1, result: errorList.LackInformation });
+      }
+
+      const user = await UserService.findById(id);
+
+      if (!user) {
+        return res.json({ code: -1, result: errorList.Failed });
+      }
+
+      const voted = await TopicService.findVotedByUserId(id);
+
+      return res.json({
+        code: 0,
+        result: {
+          topics: voted
+        }
+      })
+    } catch (error) {
+      console.log(error);
+      res.json({ code: -1, result: errorList.Exception });
+    }
+  }
+
   static async getUserBookmarks(
     id: string,
     res: jsonResponse

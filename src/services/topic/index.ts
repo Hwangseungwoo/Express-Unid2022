@@ -1,5 +1,6 @@
 import { Topic, TopicModel } from "@models/Topic";
 import { KSTDate } from "@lib/common";
+import { Types } from "mongoose";
 
 export default class TopicService {
   _id: string;
@@ -122,6 +123,19 @@ export default class TopicService {
     }
 
     return new TopicService(updateVoteResult);
+  }
+
+  static async findVotedByUserId(
+    memberId: string
+  ): Promise<any> {
+    const voted: TopicModel[] = await Topic.find({
+      $or: [
+        {agrees: { $elemMatch: { $eq: new Types.ObjectId(memberId) } } },
+        {disagrees: { $elemMatch: { $eq: new Types.ObjectId(memberId) } } },
+        {rejects: { $elemMatch: { $eq: new Types.ObjectId(memberId) } } },
+      ]
+    })
+    return voted.map(vote => new TopicService(vote));
   }
 
   static async CancelTopic(
