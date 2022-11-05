@@ -147,7 +147,7 @@ export default class TopicService {
     return new TopicService(updateVoteResult);
   }
 
-  static async getNonReadTopic(userId: string): Promise<any> {
+  static async getNonReadTopic(userId: string | null): Promise<any> {
     const topic: TopicModel | null = await Topic.findOne({
       $and: [
         {
@@ -158,6 +158,14 @@ export default class TopicService {
       ],
     });
 
-    return topic ? new TopicService(topic) : null;
+    const randomTopic: TopicModel | null = await Topic.findOne({});
+
+    return userId === null
+      ? randomTopic
+        ? new TopicService(randomTopic)
+        : null
+      : topic
+      ? new TopicService(topic)
+      : null;
   }
 }

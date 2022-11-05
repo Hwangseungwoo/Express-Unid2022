@@ -8,6 +8,16 @@ const router = express.Router();
 
 // 리스트 불러오기
 router.get(
+  "/random",
+  Authentication.check(false),
+  asyncWrapper(
+    async (res: jsonResponse) =>
+      await TopicApi.getRandomTopic(res.locals.memberUniqueId, res)
+  )
+);
+
+// 리스트 불러오기
+router.get(
   "/all/:sortBy",
   asyncWrapper(
     async (req: { params: { sortBy: "latest" | "hot" } }, res: jsonResponse) =>
