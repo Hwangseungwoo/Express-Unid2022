@@ -50,8 +50,8 @@ router.get(
   "/topics/test/test",
   Authentication.check(true),
   asyncWrapper(
-    async (req: { params: { finishedAt: string } }, res: jsonResponse) => 
-    await UserApi.getUserTopics(res.locals.memberUniqueId, req.params.finishedAt, res)
+    async (req: { params: { isFinished: string } }, res: jsonResponse) => 
+    await UserApi.getUserTopics(res.locals.memberUniqueId, req.params.isFinished, res)
   )
 );
 
@@ -60,8 +60,8 @@ router.get(
   "/voted/test/test",
   Authentication.check(true),
   asyncWrapper(
-    async (req: { params: { finishedAt: string }}, res: jsonResponse) => 
-    await UserApi.getUserVoted(res.locals.memberUniqueId, req.params.finishedAt, res)
+    async (req: { params: { isFinished: string }}, res: jsonResponse) => 
+    await UserApi.getUserVoted(res.locals.memberUniqueId, req.params.isFinished, res)
   )
 );
 
@@ -70,8 +70,8 @@ router.get(
   "/bookmarks/test/test",
   Authentication.check(true),
   asyncWrapper(
-    async (req: { params: { finishedAt: string } }, res: jsonResponse) => 
-      await UserApi.getUserBookmarks(res.locals.memberUniqueId, req.params.finishedAt, res)
+    async (req: { params: { isFinished: string } }, res: jsonResponse) => 
+      await UserApi.getUserBookmarks(res.locals.memberUniqueId, req.params.isFinished, res)
   )
 );
 
