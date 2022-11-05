@@ -105,6 +105,24 @@ export default class UserApi {
         return res.json({ code: -1, result: errorList.LackInformation });
       }
 
+      const topics = await TopicService.findByUserId(id);
+
+      return res.json({ code: 0, result: { topics }})
+    } catch(error) {
+      console.log(error);
+      return res.json({ code: -1, result: errorList.Failed });
+    }
+  }
+
+  static async getUserBookmarks(
+    id: string,
+    res: jsonResponse
+  ): Promise<any> {
+    try {
+      if (!id) {
+        return res.json({ code: -1, result: errorList.LackInformation });
+      }
+
       const user = await UserService.findById(id);
 
       if (!user) {

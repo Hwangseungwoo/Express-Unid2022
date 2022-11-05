@@ -81,6 +81,16 @@ export default class TopicService {
     return topicDoc ? new TopicService(topicDoc) : null;
   }
 
+  static async findByUserId(
+    userId: string
+  ): Promise<any> {
+    const topics: TopicModel[] = await Topic.find({
+      wrote_by: userId
+    });
+    
+    return topics.map(topic => new TopicService(topic));
+  }
+
   static async voteToTopic(
     voteType: string,
     topicId: string,
