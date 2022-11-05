@@ -14,13 +14,15 @@ export default class UserApi {
         return res.json({ code: -1, result: errorList.LackInformation });
       }
 
-      const user: UserModel | null = await UserService.findById(userId);
+      const user = await UserService.findById(userId);
 
       if (!user) {
         return res.json({ code: -1, result: errorList.NoUser });
       }
 
-      if (password !== user.password) {
+      const isSamePassword = await user.comparePassword(password);
+
+      if (!isSamePassword) {
         return res.json({ code: -1, result: errorList.Unauthorized });
       }
       const token = await TokenService.issueToken(userId, user.name);
@@ -49,5 +51,39 @@ export default class UserApi {
       console.log(error);
       return res.json({ code: -1, result: errorList.Exception });
     }
+  }
+
+  static async signUp(
+    body: {
+      id: string;
+      password: string;
+      name: string;
+      gender: string;
+      age: number;
+    },
+    res: jsonResponse
+  ) {
+    const { id, password, name, gender, age } = body;
+    if (!id || !password || !name || !gender || !age) {
+      return res.json({ code: -1, result: errorList.LackInformation });
+    }
+
+    if (age > 30) {
+      return res.json({ code: -1, result: errorList.NotAllowed });
+    }
+
+    const isSignUpSucceeded = await UserService.insertUser(
+      id,
+      password,
+      name,
+      gender,
+      age
+    );
+
+    if (!isSignUpSucceeded) {
+      return res.json({ code: -1, result: errorList.Failed });
+    }
+
+    return res.json({ code: 0 });
   }
 }

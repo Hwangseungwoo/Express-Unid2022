@@ -25,4 +25,23 @@ router.get(
   )
 );
 
+// 회원가입
+router.post(
+  "/signup",
+  asyncWrapper(
+    async (
+      req: {
+        body: {
+          id: string;
+          password: string;
+          name: string;
+          gender: string;
+          age: number;
+        };
+      },
+      res: jsonResponse
+    ) => await UserApi.signUp(req.body, res)
+  )
+);
+
 export default router;

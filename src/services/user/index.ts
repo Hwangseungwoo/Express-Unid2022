@@ -1,4 +1,5 @@
 import { UserModel, User } from "@models/User";
+import bcrypt from "bcryptjs";
 
 export default class UserService {
   _id: string;
@@ -7,8 +8,10 @@ export default class UserService {
   name: string;
   gender: string;
   age: string;
+  userDoc: UserModel;
 
   constructor(user: UserModel) {
+    this.userDoc = user;
     this._id = String(user._id);
     this.id = user.id;
     this.password = user.password;
@@ -25,5 +28,44 @@ export default class UserService {
     const user: UserModel | null = await User.findOne({ id });
 
     return user ? new UserService(user) : null;
+  }
+
+  async comparePassword(password?: string): Promise<boolean | null> {
+    if (!password) {
+      return null;
+    }
+    return bcrypt.compareSync(password, this.userDoc.password);
+  }
+
+  static async insertUser(
+    userId: string,
+    password: string,
+    name: string,
+    gender: string,
+    age: number
+  ): Promise<boolean | null> {
+    const user = await User.findOne({ id: userId });
+    if (user) {
+      return null;
+    }
+
+    const encryptedPwd: string = (() => {
+      let salt: string = bcrypt.genSaltSync(12);
+      return bcrypt.hashSync(password, salt);
+    })();
+
+    const userDoc = await new User({
+      id: userId,
+      password: encryptedPwd,
+      name,
+      gender,
+      age,
+    }).save();
+
+    if (!userDoc) {
+      return null;
+    }
+
+    return true;
   }
 }
