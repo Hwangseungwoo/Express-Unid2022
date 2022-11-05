@@ -6,7 +6,7 @@ export default class CommentApi {
     topicId: string,
     memberId: string,
     res: jsonResponse
-  ): Promise<any> {
+  ) {
     try {
       if (!topicId) {
         return res.json({ code: -1, result: errorList.LackInformation });
@@ -34,7 +34,7 @@ export default class CommentApi {
     topicId: string,
     memberId: string,
     res: jsonResponse
-  ): Promise<any> {
+  ) {
     try {
       if (!content || !topicId || !memberId) {
         return res.json({ code: -1, result: errorList.LackInformation });
@@ -71,7 +71,7 @@ export default class CommentApi {
     body: { content: string; commentId: string; topicId: string },
     memberId: string,
     res: jsonResponse
-  ): Promise<any> {
+  ) {
     try {
       const { content, commentId, topicId } = body;
       if (!content || !commentId || !topicId || !memberId) {
@@ -113,7 +113,7 @@ export default class CommentApi {
     topicId: string,
     memberId: string,
     res: jsonResponse
-  ): Promise<any> {
+  ) {
     try {
       if (!topicId || !memberId) {
         return res.json({ code: -1, result: errorList.LackInformation });
@@ -128,7 +128,7 @@ export default class CommentApi {
       const comments = await CommentService.findById(topicId);
 
       if (comments.length === 0) {
-        return res.json({ code: -1, result: errorList.Failed });
+        return res.json({ code: 0, result: [] });
       }
 
       return res.json({

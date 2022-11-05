@@ -29,7 +29,7 @@ export default class Authentication {
               .json({ code: -1, result: errorList.Unauthorized });
           }
 
-          const user = await UserService.findById(tokenDoc.id);
+          const user = await UserService.findOneById(tokenDoc.id);
 
           if (!user) {
             return res

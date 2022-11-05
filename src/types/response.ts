@@ -13,4 +13,6 @@ export enum errorList {
   Duplicated = 4,
   NotAllowed = 5,
   Failed = 6,
+  NoData = 7,
+  Unable = 8,
 }

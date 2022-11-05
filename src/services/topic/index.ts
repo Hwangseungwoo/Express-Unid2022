@@ -17,7 +17,7 @@ export default class TopicService {
     this._id = String(doc._id);
     this.title = doc.title;
     this.content = doc.content;
-    this.wroteBy = doc.wrote_by;
+    this.wroteBy = String(doc.wrote_by);
     this.wroteAt = doc.wrote_at;
     this.agrees = doc.agrees;
     this.disagrees = doc.disagrees;
@@ -92,39 +92,6 @@ export default class TopicService {
     return topics.map(topic => new TopicService(topic));
   }
 
-  static async voteToTopic(
-    voteType: string,
-    topicId: string,
-    memberId: string
-  ): Promise<any> {
-    let updateVoteResult: TopicModel | null;
-    if (voteType === "agree") {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $push: { agrees: memberId } },
-        { new: true }
-      );
-    } else if (voteType === "disagree") {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $push: { disagrees: memberId } },
-        { new: true }
-      );
-    } else {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $push: { rejects: memberId } },
-        { new: true }
-      );
-    }
-
-    if (!updateVoteResult) {
-      return null;
-    }
-
-    return new TopicService(updateVoteResult);
-  }
-
   static async findVotedByUserId(
     memberId: string
   ): Promise<any> {
@@ -138,30 +105,58 @@ export default class TopicService {
     return voted.map(vote => new TopicService(vote));
   }
 
-  static async CancelTopic(
+  static async updateVoteStatus(
     voteType: string,
     topicId: string,
-    memberId: string
+    memberId: string,
+    includeType: string | null
   ): Promise<any> {
     let updateVoteResult: TopicModel | null;
-    if (voteType === "agree") {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $pull: { agrees: memberId } },
-        { new: true }
-      );
-    } else if (voteType === "disagree") {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $pull: { disagrees: memberId } },
-        { new: true }
-      );
+
+    if (includeType) {
+      if (includeType !== voteType) {
+        return null;
+      } else {
+        if (voteType === "agree") {
+          updateVoteResult = await Topic.findOneAndUpdate(
+            { _id: topicId },
+            { $pull: { agrees: memberId } },
+            { new: true }
+          );
+        } else if (voteType === "disagree") {
+          updateVoteResult = await Topic.findOneAndUpdate(
+            { _id: topicId },
+            { $pull: { disagrees: memberId } },
+            { new: true }
+          );
+        } else {
+          updateVoteResult = await Topic.findOneAndUpdate(
+            { _id: topicId },
+            { $pull: { rejects: memberId } },
+            { new: true }
+          );
+        }
+      }
     } else {
-      updateVoteResult = await Topic.findOneAndUpdate(
-        { _id: topicId },
-        { $pull: { rejects: memberId } },
-        { new: true }
-      );
+      if (voteType === "agree") {
+        updateVoteResult = await Topic.findOneAndUpdate(
+          { _id: topicId },
+          { $push: { agrees: memberId } },
+          { new: true }
+        );
+      } else if (voteType === "disagree") {
+        updateVoteResult = await Topic.findOneAndUpdate(
+          { _id: topicId },
+          { $push: { disagrees: memberId } },
+          { new: true }
+        );
+      } else {
+        updateVoteResult = await Topic.findOneAndUpdate(
+          { _id: topicId },
+          { $push: { rejects: memberId } },
+          { new: true }
+        );
+      }
     }
 
     if (!updateVoteResult) {
@@ -171,7 +166,7 @@ export default class TopicService {
     return new TopicService(updateVoteResult);
   }
 
-  static async getNonReadTopic(userId: string): Promise<any> {
+  static async getNonReadTopic(userId: string | null): Promise<any> {
     const topic: TopicModel | null = await Topic.findOne({
       $and: [
         {
@@ -182,6 +177,30 @@ export default class TopicService {
       ],
     });
 
-    return topic ? new TopicService(topic) : null;
+    const randomTopic: TopicModel | null = await Topic.findOne({});
+
+    return userId === null
+      ? randomTopic
+        ? new TopicService(randomTopic)
+        : null
+      : topic
+      ? new TopicService(topic)
+      : null;
+  }
+
+  static async searchKeyword(key: string, isFinished: string): Promise<any> {
+    let topics: TopicModel[] = await Topic.find({
+      $or: [{ title: { $regex: key } }, { content: { $regex: key } }],
+    });
+
+    const nowDate = KSTDate();
+
+    if (isFinished === "true") {
+      topics.filter((topic) => topic.finished_at <= nowDate);
+    } else {
+      topics.filter((topic) => topic.finished_at > nowDate);
+    }
+
+    return topics.map((topic) => new TopicService(topic));
   }
 }
