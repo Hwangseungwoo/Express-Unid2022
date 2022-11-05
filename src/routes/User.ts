@@ -19,31 +19,43 @@ router.post(
 
 // 작성한 토픽 불러오기
 router.get(
-  "/topics",
+  "/topics/:isFinished",
   Authentication.check(true),
   asyncWrapper(
-    async (req: { params: { isFinished: string } }, res: jsonResponse) => 
-    await UserApi.getUserTopics(res.locals.memberUniqueId, req.params.isFinished, res)
+    async (req: { params: { isFinished: string } }, res: jsonResponse) =>
+      await UserApi.getUserTopics(
+        res.locals.memberUniqueId,
+        req.params.isFinished,
+        res
+      )
   )
 );
 
 // 참여한 토픽 불러오기
 router.get(
-  "/voted",
+  "/voted/:isFinished",
   Authentication.check(true),
   asyncWrapper(
-    async (req: { params: { isFinished: string }}, res: jsonResponse) => 
-    await UserApi.getUserVoted(res.locals.memberUniqueId, req.params.isFinished, res)
+    async (req: { params: { isFinished: string } }, res: jsonResponse) =>
+      await UserApi.getUserVoted(
+        res.locals.memberUniqueId,
+        req.params.isFinished,
+        res
+      )
   )
 );
 
 // 즐려찾기 토픽 불러오기
 router.get(
-  "/bookmarks",
+  "/bookmarks/:isFinished",
   Authentication.check(true),
   asyncWrapper(
-    async (req: { params: { isFinished: string } }, res: jsonResponse) => 
-      await UserApi.getUserBookmarks(res.locals.memberUniqueId, req.params.isFinished, res)
+    async (req: { params: { isFinished: string } }, res: jsonResponse) =>
+      await UserApi.getUserBookmarks(
+        res.locals.memberUniqueId,
+        req.params.isFinished,
+        res
+      )
   )
 );
 
