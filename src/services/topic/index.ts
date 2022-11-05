@@ -97,9 +97,9 @@ export default class TopicService {
   ): Promise<any> {
     const voted: TopicModel[] = await Topic.find({
       $or: [
-        {agrees: { $elemMatch: { $eq: new Types.ObjectId(memberId) } } },
-        {disagrees: { $elemMatch: { $eq: new Types.ObjectId(memberId) } } },
-        {rejects: { $elemMatch: { $eq: new Types.ObjectId(memberId) } } },
+        {agrees: { $in : [new Types.ObjectId(memberId) ] } },
+        {disagrees: { $in : [new Types.ObjectId(memberId) ] } },
+        {rejects: { $in : [new Types.ObjectId(memberId) ] } },
       ]
     })
     return voted.map(vote => new TopicService(vote));
