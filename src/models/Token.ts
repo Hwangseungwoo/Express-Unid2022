@@ -2,7 +2,6 @@ import { Schema } from "mongoose";
 import { db } from "@models/db";
 
 let TokenSchema = new Schema({
-  _id: Schema.Types.ObjectId,
   token: String,
   created_at: Date,
   expired_at: Date,

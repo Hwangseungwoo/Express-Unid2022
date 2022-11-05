@@ -16,6 +16,10 @@ export default class UserService {
     this.gender = user.gender;
     this.age = user.age;
   }
+  static async find(): Promise<any> {
+    const users = await User.find();
+    return users;
+  }
 
   static async findById(id: string): Promise<any> {
     const user: UserModel | null = await User.findOne({ id });

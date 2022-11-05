@@ -2,7 +2,6 @@ import { Schema } from "mongoose";
 import { db } from "@models/db";
 
 let TopicSchema = new Schema({
-  _id: Schema.Types.ObjectId,
   title: String,
   content: String,
   wrote_by: Schema.Types.ObjectId,

@@ -2,7 +2,6 @@ import { Schema } from "mongoose";
 import { db } from "@models/db";
 
 let CommentSchema = new Schema({
-  _id: Schema.Types.ObjectId,
   content: String,
   wrote_by: Schema.Types.ObjectId,
   wrote_at: Date,

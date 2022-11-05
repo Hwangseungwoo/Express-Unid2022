@@ -2,7 +2,6 @@ import { Schema } from "mongoose";
 import { db } from "@models/db";
 
 let UserSchema = new Schema({
-  _id: Schema.Types.ObjectId,
   id: String,
   password: String,
   name: String,
