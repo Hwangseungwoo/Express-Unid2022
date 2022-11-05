@@ -54,7 +54,7 @@ router.post(
   )
 );
 
-// 토픽에 찬성, 반대, 거절
+// 토픽에 찬성, 반대, 거절 수정
 router.put(
   ":topicId/likes/:likeType",
   Authentication.check(true),
@@ -63,7 +63,7 @@ router.put(
       req: { params: { topicId: string; likeType: string } },
       res: jsonResponse
     ) =>
-      await TopicApi.voteTopic(
+      await TopicApi.cancelVote(
         req.params.topicId,
         req.params.likeType,
         res.locals.memberUniqueId,
