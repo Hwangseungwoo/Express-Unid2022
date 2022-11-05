@@ -1,5 +1,6 @@
 import { UserModel, User } from "@models/User";
 import bcrypt from "bcryptjs";
+import { Types } from "mongoose";
 
 export default class UserService {
   _id: string;
@@ -20,7 +21,14 @@ export default class UserService {
     this.age = user.age;
   }
   static async find(): Promise<any> {
-    const users = await User.find();
+    const users: UserModel[] = await User.find();
+    return users.map((user) => new UserService(user));
+  }
+
+  static async findByIds(ids: string[]): Promise<any> {
+    const users: UserModel[] = await User.find({
+      _id: { $in: ids.map((id) => new Types.ObjectId(id)) },
+    });
     return users;
   }
 

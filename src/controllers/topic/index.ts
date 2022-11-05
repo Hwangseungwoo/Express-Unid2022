@@ -1,5 +1,6 @@
 import { jsonResponse, errorList } from "../../types/response";
 import TopicService from "@services/topic";
+import UserService from "@services/user";
 
 export default class TopicApi {
   static async getTopics(
@@ -16,7 +17,19 @@ export default class TopicApi {
       return res.json({ code: -1, result: errorList.Failed });
     }
 
-    return res.json({ code: 0, result: { topics } });
+    const users = await UserService.findByIds(
+      topics.map((topic: any) => topic.wroteBy)
+    );
+
+    return res.json({
+      code: 0,
+      result: {
+        topics: topics.map((topic: any) => {
+          const user = users.find((user: any) => user.id === topic.wroteBy);
+          return { ...topic, userName: user.name };
+        }),
+      },
+    });
   }
 
   static async getTopic(topicId: string, res: jsonResponse): Promise<any> {
@@ -30,7 +43,16 @@ export default class TopicApi {
       return res.json({ code: -1, result: errorList.Failed });
     }
 
-    return res.json({ code: 0, result: { topic } });
+    const user = await UserService.findById(topic.wroteBy);
+
+    if (!user) {
+      return res.json({ code: -1, result: errorList.Failed });
+    }
+
+    return res.json({
+      code: 0,
+      result: { topic: { ...topic, userName: user.name } },
+    });
   }
 
   static async postTopic(
@@ -78,7 +100,16 @@ export default class TopicApi {
       return res.json({ code: -1, result: errorList.Failed });
     }
 
-    return res.json({ code: 0, result: { topic: voteResult } });
+    const user = await UserService.findById(voteResult.wroteBy);
+
+    if (!user) {
+      return res.json({ code: -1, result: errorList.Failed });
+    }
+
+    return res.json({
+      code: 0,
+      result: { topic: { ...voteResult, userName: user.name } },
+    });
   }
 
   static async cancelVote(
@@ -105,6 +136,15 @@ export default class TopicApi {
       return res.json({ code: -1, result: errorList.Failed });
     }
 
-    return res.json({ code: 0, result: { topic: voteResult } });
+    const user = await UserService.findById(voteResult.wroteBy);
+
+    if (!user) {
+      return res.json({ code: -1, result: errorList.Failed });
+    }
+
+    return res.json({
+      code: 0,
+      result: { ...voteResult, userName: user.name },
+    });
   }
 }
