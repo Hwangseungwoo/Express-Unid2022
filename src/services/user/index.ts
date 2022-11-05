@@ -68,7 +68,7 @@ export default class UserService {
       name,
       gender,
       age,
-      favorite_topics: []
+      favorite_topics: [],
     }).save();
 
     if (!userDoc) {
@@ -77,15 +77,12 @@ export default class UserService {
 
     return true;
   }
- 
-  static async insertFavorite(
-    userId: string,
-    topicId: string,
-  ): Promise<any> {
+
+  static async insertFavorite(userId: string, topicId: string): Promise<any> {
     const user: UserModel | null = await User.findOneAndUpdate(
-      {id: userId}, 
-      {$push: {favorite_topics: { topic_id: new Types.ObjectId(topicId) }}},
-      {new: true}
+      { id: userId },
+      { $push: { favorite_topics: new Types.ObjectId(topicId) } },
+      { new: true }
     );
 
     if (!user) {
