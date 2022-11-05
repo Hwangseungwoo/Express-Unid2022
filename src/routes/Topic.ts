@@ -72,4 +72,21 @@ router.put(
   )
 );
 
+// 토픽 즐겨찾기
+router.put(
+  ":topicId/favorite",
+  Authentication.check(true),
+  asyncWrapper(
+    async (
+      req: { params: { topicId: string }},
+      res: jsonResponse
+    ) => 
+    await TopicApi.likeFavoriteTopic(
+      req.params.topicId,
+      res.locals.memberUniqueId,
+      res
+    )
+  )
+);
+
 export default router;
