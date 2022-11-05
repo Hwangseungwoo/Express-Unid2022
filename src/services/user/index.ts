@@ -79,11 +79,11 @@ export default class UserService {
  
   static async insertFavorite(
     userId: string,
-    topicId: string
+    topicId: string,
   ): Promise<any> {
     const user: UserModel | null = await User.findOneAndUpdate(
       {id: userId}, 
-      {$push: {favorite_topics: { _id: new Types.ObjectId(topicId) }}},
+      {$push: {favorite_topics: { topic_id: new Types.ObjectId(topicId) }}},
       {new: true}
     );
 

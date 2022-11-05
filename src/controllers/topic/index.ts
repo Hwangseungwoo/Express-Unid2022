@@ -182,11 +182,17 @@ export default class TopicApi {
       if (!topicId  || !memberId) {
         return res.json({ code: -1, result: errorList.LackInformation});
       }
+      
+      const topic = await TopicService.findOneById(topicId);
 
-      const user = await UserService.insertFavorite(memberId, topicId);
+      if (!topic) {
+        return res.json({ code: -1, result: errorList.Failed });
+      }
+
+      const user = await UserService.insertFavorite(memberId, topic._id);
 
       if (!user) {
-        return res.json({ code: 1, result: errorList.Failed });
+        return res.json({ code: -11, result: errorList.Failed });
       }
 
       return res.json({
