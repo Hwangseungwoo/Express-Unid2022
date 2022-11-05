@@ -1,5 +1,6 @@
 import TokenService from "@services/token";
 import { errorList, jsonResponse } from "../types/response";
+import UserService from "@services/user";
 
 export default class Authentication {
   static check(memberRequired: boolean) {
@@ -34,7 +35,17 @@ export default class Authentication {
               .status(401)
               .json({ code: -1, result: errorList.Unauthorized });
           }
+
+          const user = await UserService.findById(tokenDoc.id);
+
+          if (!user) {
+            return res
+              .status(401)
+              .json({ code: -1, result: errorList.Unauthorized });
+          }
+
           res.locals.memberId = tokenDoc.id;
+          res.locals.memberUniqueId = user._id;
           return next();
         } else {
           return res
