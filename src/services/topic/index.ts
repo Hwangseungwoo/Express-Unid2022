@@ -53,10 +53,21 @@ export default class TopicService {
     }
   }
 
-  static async findByIds(ids: string[]): Promise<any> {
-    const topics: TopicModel[] = await Topic.find({
-      _id: { $in: ids.map((id) => new Types.ObjectId(id)) },
-    })
+  static async findByIds(ids: string[], isFinished: string): Promise<any> {
+    let topics: TopicModel[];
+    const nowDate = KSTDate();
+
+    if (isFinished == "true") {
+      topics = await Topic.find({
+        _id: { $in: ids.map((id) => new Types.ObjectId(id)) },
+        finished_at: { $lt: nowDate }
+      })
+    } else {
+      topics = await Topic.find({
+        _id: { $in: ids.map((id) => new Types.ObjectId(id)) },
+        finished_at: { $gt: nowDate }
+      })
+    }
     return topics.map(topic => new TopicService(topic));
   }
 
@@ -90,25 +101,54 @@ export default class TopicService {
   }
 
   static async findByUserId(
-    userId: string
+    userId: string,
+    isFinished: string,
   ): Promise<any> {
-    const topics: TopicModel[] = await Topic.find({
-      wrote_by: userId
-    });
+    let topics: TopicModel[];
+    const nowDate = KSTDate();
+
+    if (isFinished == "true") {
+      topics  = await Topic.find({
+        wrote_by: userId,
+        finished_at: { $lt: nowDate }
+      });
+    } else {
+      topics = await Topic.find({
+        wrote_by: userId,
+        finished_at: { $gt: nowDate }
+      });
+    }
     
     return topics.map(topic => new TopicService(topic));
   }
 
   static async findVotedByUserId(
-    memberId: string
+    memberId: string,
+    isFinished: string
   ): Promise<any> {
-    const voted: TopicModel[] = await Topic.find({
-      $or: [
-        {agrees: { $in : [new Types.ObjectId(memberId) ] } },
-        {disagrees: { $in : [new Types.ObjectId(memberId) ] } },
-        {rejects: { $in : [new Types.ObjectId(memberId) ] } },
-      ]
-    })
+    let voted: TopicModel[];
+    const nowDate = KSTDate();
+
+    if (isFinished == "true") {
+      voted = await Topic.find({
+        $or: [
+          {agrees: { $in : [new Types.ObjectId(memberId) ] } },
+          {disagrees: { $in : [new Types.ObjectId(memberId) ] } },
+          {rejects: { $in : [new Types.ObjectId(memberId) ] } },
+        ],
+      finished_at: { $lt: nowDate }
+      })
+    } else {
+      voted = await Topic.find({
+        $or: [
+          {agrees: { $in : [new Types.ObjectId(memberId) ] } },
+          {disagrees: { $in : [new Types.ObjectId(memberId) ] } },
+          {rejects: { $in : [new Types.ObjectId(memberId) ] } },
+        ],
+        finished_at: { $gt: nowDate }
+      })
+    }
+    
     return voted.map(vote => new TopicService(vote));
   }
 

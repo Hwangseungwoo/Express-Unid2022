@@ -50,7 +50,8 @@ router.get(
   "/topics/test/test",
   Authentication.check(true),
   asyncWrapper(
-    async (req: any, res: jsonResponse) => await UserApi.getUserTopics(res.locals.memberUniqueId, res)
+    async (req: { params: { finishedAt: string } }, res: jsonResponse) => 
+    await UserApi.getUserTopics(res.locals.memberUniqueId, req.params.finishedAt, res)
   )
 );
 
@@ -59,7 +60,8 @@ router.get(
   "/voted/test/test",
   Authentication.check(true),
   asyncWrapper(
-    async (req: any, res: jsonResponse) => await UserApi.getUserVoted(res.locals.memberUniqueId, res)
+    async (req: { params: { finishedAt: string }}, res: jsonResponse) => 
+    await UserApi.getUserVoted(res.locals.memberUniqueId, req.params.finishedAt, res)
   )
 );
 
@@ -68,8 +70,8 @@ router.get(
   "/bookmarks/test/test",
   Authentication.check(true),
   asyncWrapper(
-    async (req: any, res: jsonResponse) => 
-      await UserApi.getUserBookmarks(res.locals.memberUniqueId, res)
+    async (req: { params: { finishedAt: string } }, res: jsonResponse) => 
+      await UserApi.getUserBookmarks(res.locals.memberUniqueId, req.params.finishedAt, res)
   )
 );
 
