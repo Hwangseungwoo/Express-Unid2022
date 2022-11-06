@@ -231,11 +231,11 @@ export default class TopicApi {
       }
 
       const includeType = topic.agrees.includes(memberId)
-        ? "agrees"
+        ? "agree"
         : topic.disagrees.includes(memberId)
-        ? "disagrees"
+        ? "disagree"
         : topic.rejects.includes(memberId)
-        ? "rejects"
+        ? "reject"
         : null;
 
       const voteResult = await TopicService.updateVoteStatus(
