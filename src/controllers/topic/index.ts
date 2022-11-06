@@ -91,15 +91,14 @@ export default class TopicApi {
             return {
               ...topic,
               remainDays: topic.finishedAt.getDate() - nowDate.getDate(),
-              percentage: parseInt(
-                String(
-                  topic.agrees.length + topic.disagrees.length === 0
-                    ? 100
-                    : (topic.agrees.length / topic.agrees.length +
-                        topic.disagrees.length) *
-                        100
-                )
-              ),
+              percentage:
+                topic.agrees.length + topic.disagrees.length === 0
+                  ? 100
+                  : topic.agrees.length === 0
+                  ? 0
+                  : (topic.agrees.length / topic.agrees.length +
+                      topic.disagrees.length) *
+                    10,
             };
           }),
         },
@@ -192,6 +191,18 @@ export default class TopicApi {
             buttonSelected,
             isFinished: topic.finishedAt <= nowDate,
             isBookmarked,
+            period:
+              topic.wroteAt.toISOString().substring(0, 10) +
+              " ~ " +
+              topic.finishedAt.toISOString().substring(0, 10),
+            percentage:
+              topic.agrees.length + topic.disagrees.length === 0
+                ? 100
+                : topic.agrees.length === 0
+                ? 0
+                : (topic.agrees.length / topic.agrees.length +
+                    topic.disagrees.length) *
+                  10,
           },
         },
       });
