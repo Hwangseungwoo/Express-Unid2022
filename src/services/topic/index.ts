@@ -210,26 +210,10 @@ export default class TopicService {
     return new TopicService(updateVoteResult);
   }
 
-  static async getNonReadTopic(userId: string | null): Promise<any> {
-    const topic: TopicModel | null = await Topic.findOne({
-      $and: [
-        {
-          $nin: { agrees: userId },
-        },
-        { $nin: { disagrees: userId } },
-        { $nin: { rejects: userId } },
-      ],
-    });
+  static async getNonReadTopic(): Promise<any> {
+    const topics: TopicModel[] = await Topic.find({});
 
-    const randomTopic: TopicModel | null = await Topic.findOne({});
-
-    return userId === null
-      ? randomTopic
-        ? new TopicService(randomTopic)
-        : null
-      : topic
-      ? new TopicService(topic)
-      : null;
+    return topics.map((topic: any) => new TopicService(topic));
   }
 
   static async searchKeyword(key: string, isFinished: string): Promise<any> {

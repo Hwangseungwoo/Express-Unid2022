@@ -6,12 +6,18 @@ import { KSTDate } from "@lib/common";
 export default class TopicApi {
   static async getRandomTopic(userId: string, res: jsonResponse) {
     try {
-      const topic = await TopicService.getNonReadTopic(userId);
-      if (!topic) {
-        return res.json({ code: 0, result: null });
-      }
+      let topics = await TopicService.getNonReadTopic();
 
-      return res.json({ code: 0, result: { topic } });
+      topics = topics.filter(
+        (topic: any) =>
+          !topic.agrees.includes(userId) &&
+          !topic.disagrees.includes(userId) &&
+          !topic.rejects.includes(userId)
+      );
+
+      const random: number = Math.floor(Math.random() * topics.length);
+
+      return res.json({ code: 0, result: { topic: topics[random] } });
     } catch (error) {
       console.log(error);
       return res.json({ code: -1, result: errorList.Exception });

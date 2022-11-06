@@ -11,7 +11,7 @@ router.get(
   "/random",
   Authentication.check(false),
   asyncWrapper(
-    async (res: jsonResponse) =>
+    async (req: any, res: jsonResponse) =>
       await TopicApi.getRandomTopic(res.locals.memberUniqueId, res)
   )
 );
