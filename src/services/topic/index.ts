@@ -35,12 +35,14 @@ export default class TopicService {
       });
 
       if (sortBy === "hot") {
-        topics.sort(
+        topics = topics.sort(
           (a, b) =>
             b.agrees.length +
             b.disagrees.length -
             (a.agrees.length + a.disagrees.length)
         );
+      } else {
+        topics = topics.reverse();
       }
 
       return topics.map((topic) => new TopicService(topic));
