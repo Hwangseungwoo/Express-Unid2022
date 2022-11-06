@@ -37,9 +37,9 @@ export default class TopicService {
       if (sortBy === "hot") {
         topics.sort(
           (a, b) =>
-            a.agrees.length +
-            a.disagrees.length -
-            (b.agrees.length + b.disagrees.length)
+            b.agrees.length +
+            b.disagrees.length -
+            (a.agrees.length + a.disagrees.length)
         );
       }
 
