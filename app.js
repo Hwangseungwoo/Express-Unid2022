@@ -4,8 +4,11 @@ let createError = require("http-errors");
 let express = require("express");
 let cookieParser = require("cookie-parser");
 const indexRouter = require("./build/routes");
+const cors = require("cors");
 
 let app = express();
+
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 
 app.disable("x-powered-by");
 
@@ -34,6 +37,21 @@ app.use(function (err, req, res, next) {
     code: -1,
     message: err.name === "Error" ? err.message : undefined,
   });
+});
+
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-origin", "*");
+
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "X-Requested-With,content-type"
+  );
+
+  next();
 });
 
 app.listen(process.env.NODE_ENV !== "test" ? 5200 : 5201);
