@@ -211,7 +211,10 @@ export default class TopicService {
   }
 
   static async getNonReadTopic(): Promise<any> {
-    const topics: TopicModel[] = await Topic.find({});
+    const nowDate = KSTDate();
+    const topics: TopicModel[] = await Topic.find({
+      finished_at: { $gt: nowDate },
+    });
 
     return topics.map((topic: any) => new TopicService(topic));
   }

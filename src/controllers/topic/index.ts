@@ -17,7 +17,17 @@ export default class TopicApi {
 
       const random: number = Math.floor(Math.random() * topics.length);
 
-      return res.json({ code: 0, result: { topic: topics[random] } });
+      const nowDate = KSTDate();
+
+      return res.json({
+        code: 0,
+        result: {
+          topic: {
+            ...topics[random],
+            remainDays: topics[random].finishedAt.getDate() - nowDate.getDate(),
+          },
+        },
+      });
     } catch (error) {
       console.log(error);
       return res.json({ code: -1, result: errorList.Exception });
@@ -81,6 +91,15 @@ export default class TopicApi {
             return {
               ...topic,
               remainDays: topic.finishedAt.getDate() - nowDate.getDate(),
+              percentage: parseInt(
+                String(
+                  topic.agrees.length + topic.disagrees.length === 0
+                    ? 100
+                    : (topic.agrees.length / topic.agrees.length +
+                        topic.disagrees.length) *
+                        100
+                )
+              ),
             };
           }),
         },
